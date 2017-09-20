@@ -112,7 +112,22 @@ def find_predictor(user, restaurants, feature_fn):
     ys = [reviews_by_user[restaurant_name(r)] for r in restaurants]
 
     # BEGIN Question 7
-    b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
+    x_avg = mean(xs)
+    y_avg = mean(ys)
+
+    xys = zip(xs,ys)
+
+    sum_xx, sum_yy, sum_xy = 0,0,0
+    for i in xs:
+        sum_xx += (i - x_avg)**2
+    for i in ys:
+        sum_yy += (i - y_avg)**2
+    for i in xys:
+        sum_xy += (i[0] - x_avg)*(i[1] - y_avg)
+    
+    b = sum_xy/sum_xx
+    a = y_avg - b*x_avg
+    r_squared = abs((sum_xy**2)/(sum_xx * sum_yy))
     # END Question 7
 
     def predictor(restaurant):
@@ -132,7 +147,10 @@ def best_predictor(user, restaurants, feature_fns):
     """
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 8
-    "*** REPLACE THIS LINE ***"
+    predictors = []
+    for i in feature_fns:
+        predictors.append(find_predictor(user, reviewed, i))
+    return max(predictors,key=lambda x: x[1])[0]
     # END Question 8
 
 
@@ -148,7 +166,13 @@ def rate_all(user, restaurants, feature_fns):
     predictor = best_predictor(user, ALL_RESTAURANTS, feature_fns)
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 9
-    "*** REPLACE THIS LINE ***"
+    ratings = {}
+    for i in restaurants:
+        if not (restaurant_name(i) in user_reviews(user)):
+            ratings[restaurant_name(i)] = predictor(i)
+        else:
+            ratings[restaurant_name(i)] = review_rating(user_reviews(user)[restaurant_name(i)])
+    return ratings
     # END Question 9
 
 
@@ -160,7 +184,11 @@ def search(query, restaurants):
     restaurants -- A sequence of restaurants
     """
     # BEGIN Question 10
-    "*** REPLACE THIS LINE ***"
+    searched = []
+    for i in restaurants:
+        if query in restaurant_categories(i):
+            searched.append(i)
+    return searched
     # END Question 10
 
 
